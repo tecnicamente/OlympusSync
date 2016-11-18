@@ -38,7 +38,7 @@ WiFiCameraName = "E-M10 WiFi"
 def StartConnection(url):
 	try:
 		OlympusHost = urllib2.urlopen(UrlToOpen)
-		print ">>[INFO]	" +UrlToOpen + " open"
+		print ">>[INFO]	" +UrlToOpen + "-> Open"
 		return OlympusHost
 
 	except IOError, e:
@@ -59,17 +59,17 @@ def Warning(par):
 	sys.exit(2)
 
 def Help():
-	#print '>>[HELP]	"-v" or "--verbose"	: verbose output, the parameter will show alla data managed by the software'
-	print '>>[HELP]	"-h" or "--help"	:help indication, the parameter will print the help indications'
-	print '>>[HELP]	"-d" or "--destination="	: output directory, the parameter will define where store the output files'
-	print '>>[HELP]	"-j" or "--jpeg"	: download only .JPG files'
-	print '>>[HELP]	"-o" or "--orf"		: download only .ORF files'
-	#print '>>[HELP]	"-s" or "--split"	: save .JPG and .ORF in separate JPG and ORF directory'
-	#print '>>[HELP]	"-f" or "--force"	: overwrite the existing files in the destination directory'
-	#print '>>[HELP]	"-c" or "--choose"	: choose a specific file to download'
-	#print '>>[HELP]	"-r" or "--release"	: print software release
-	print '>>[HELP] "-l" or "--list"	: print file list prensent on the device'
-	print '>>[HELP] "-L" or "--last="	: download last <n> images'
+	#print '>>[HELP]	"-v" or "--verbose"  : verbose output, the parameter will show alla data managed by the software'
+	print '>>[HELP] "-h" or "--help"        : help indication, the parameter will print the help indications'
+	print '>>[HELP] "-d" or "--destination=": output directory, the parameter will define where store the output files'
+	print '>>[HELP] "-j" or "--jpeg"        : download only .JPG files'
+	print '>>[HELP] "-o" or "--orf"         : download only .ORF files'
+	#print '>>[HELP] "-s" or "--split"       : save .JPG and .ORF in separate JPG and ORF directory'
+	#print '>>[HELP] "-f" or "--force"       : overwrite the existing files in the destination directory'
+	#print '>>[HELP] "-c" or "--choose"      : choose a specific file to download'
+	#print '>>[HELP] "-r" or "--release"     : print software release
+	print '>>[HELP] "-l" or "--list"         : print file list prensent on the device'
+	print '>>[HELP] "-L" or "--last="       : download last <n> images'
 	return
 	
 def CheckParameter(par):
@@ -87,12 +87,13 @@ def CheckParameter(par):
 # Parameters priority:
 # h, 
 	if len(par)<2:
+		print par
 		Warning(par)
 		sys.exit(2)
 	else:
 		try:
 			options, args = getopt.getopt(par[1:], "vhd:josfcrlL:",["verbose","help","destination=","onlyjpg","onlyorf","splittype","overwrite","choose=","release","list","last="])
-		except getopt.GetOptError:
+		except :
 			Warning(par)		
 	return options
 	
@@ -100,6 +101,7 @@ def showFileList(urlToOpen):
 	OlympusHost = StartConnection(UrlToOpen)
 	imagesName=[]
 	row = OlympusHost.readline()
+	rowNumber = 0
 	while row:
 		rowComponents = row.split(",")
 
@@ -114,6 +116,7 @@ def showFileList(urlToOpen):
 
 	for i in range(numberOfImages):
 		print ">>[INFO]	" + imagesName[i]
+	OlympusHost.close()
 	return
 
 ###### MAIN #########
@@ -122,46 +125,50 @@ rowNumber = 0
 imagesDownloaded = 0
 percentageDonwload = 0
 
-
-
 options = CheckParameter(sys.argv)
-#print options # DEBUG
-for o,a in options:
-	if o in ('-h','--help'):
-		Help()
-		sys.exit(2)
-	if o in ('l','--list'):
-		showFilelist(UrlToOpen)
-		sys.exit(2)
-	if o in ('-v','--verbose'):
-		verboseValue = True
-	else:
-		verboseValue = False
-	if o in ('-d','--destination'):
-		destination = a
-	else:
-		print ">>[WARNING]	Please add destionation using '-d' or '--destionation='"
-		sys.exit(2)
-	if o in ('-j','-jpeg'):
-		OnlyJpeg = True
-	else:
-		OnlyJpeg = False
-	if o in ('-o','--orf'):
-		OnlyOrf = True
-	else:
-		OnlyOrf = False
-	if o in ('-s','--split'):
-		SplitFile = True
-	else:
-		SplitFile = False
-	if o in ('-f','--force'):
-		Force = True
-	else:
-		Force = False
-	if o in ('-c','--choose'):
-		FileToDownload = a
-	if o in ('r','--release'):
-		printRelease()
+print options # DEBUG
+for i in range(len(sys.argv)/2):
+	print ":::", range(len(sys.argv)/2)
+	for o,a in options:
+		print o,a
+		if o in ('-h','--help'):
+			Help()
+			sys.exit(2)
+		if o in ('-l','--list'):
+			showFileList(UrlToOpen)
+			sys.exit(2)
+		if o in ('-v','--verbose'):
+		# function not defined
+			verboseValue = True
+		else:
+			verboseValue = False
+		if o in ('-j','--jpeg'):
+				OnlyJpeg = True
+		else:
+			OnlyJpeg = False
+		if o in ('-o','--orf'):
+			OnlyOrf = True
+		else:
+			OnlyOrf = False
+		if o in ('-s','--split'):
+			SplitFile = True
+		else:
+			SplitFile = False
+		if o in ('-f','--force'):
+			Force = True
+		else:
+			Force = False
+		if o in ('-c','--choose'):
+			FileToDownload = a
+		if o in ('r','--release'):
+			printRelease()
+		if o in ('-d','--destination'):
+			destination = a
+		else:
+			print ">>[WARNING]	Please add destionation using '-d <foo> or '--destionation=<foo>'"
+			print ">>[WARNING]	default '/tmp' directory will be used (valid on *nix and OSX OS"
+			destination = "/tmp/"
+			#sys.exit(2)
 
 	
 
@@ -187,13 +194,28 @@ for i in range(numberOfImages):
 	source = "http://oishare/DCIM/100OLYMP/" + imagesName[i]
 	#destination = "/tmp/" + imagesName[i]
 	destination = destination + imagesName[i]
-	print ">>	[INFO]	" + source + " ---> " + destination
-	urllib.urlretrieve(source ,destination)
-	imagesDownloaded = imagesDownloaded + 1
-	percentageDownload = double(imageDownloaded)/ len(numberOfImages)
-	print ">>	[INFO]	Image " + imagesName[i] + " downloaded" + "(" + str(imagesDownloaded/numberOfImages) + ")"
-	print ">>	[INFO]	Downloaded images:	" + str(imagesDownloaded)
+	if OnlyJpeg == True and ".JPG" in imagesName[i]:
+		print ">>	[INFO]	" + source + " ---> " + destination
+		urllib.urlretrieve(source ,destination)
+		imagesDownloaded = imagesDownloaded + 1
+		#percentageDownload = double(imageDownloaded)/ len(numberOfImages)
+		print ">>	[INFO]	Image " + imagesName[i] + " downloaded" + "(" + str(imagesDownloaded/numberOfImages) + ")"
+		print ">>	[INFO]	Downloaded images:	" + str(imagesDownloaded)
+	if OnlyOrf == True and ".ORF" in imagesName[i]:
+		print ">>	[INFO]	" + source + " ---> " + destination
+		urllib.urlretrieve(source ,destination)
+		imagesDownloaded = imagesDownloaded + 1
+		#percentageDownload = double(imageDownloaded)/ len(numberOfImages)
+		print ">>	[INFO]	Image " + imagesName[i] + " downloaded" + "(" + str(imagesDownloaded/numberOfImages) + ")"
+		print ">>	[INFO]	Downloaded images:	" + str(imagesDownloaded)
+	if OnlyOrf == False and OnlyJpeg == False:
+		print ">>	[INFO]	" + source + " ---> " + destination
+		urllib.urlretrieve(source ,destination)
+		imagesDownloaded = imagesDownloaded + 1
+		#percentageDownload = double(imageDownloaded)/ len(numberOfImages)
+		print ">>	[INFO]	Image " + imagesName[i] + " downloaded" + "(" + str(imagesDownloaded/numberOfImages) + ")"
+		print ">>	[INFO]	Downloaded images:	" + str(imagesDownloaded)
 
-print ">>	[INFO]	All files downloades"
+print ">>	[INFO]	All files downloaded"
 
 OlympusHost.close()
