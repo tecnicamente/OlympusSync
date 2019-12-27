@@ -14,7 +14,7 @@ import sys
 # =========
 # 1. PARAMETERS CHECK
 # 2. HELP MANIUAL
-# 3. CONTROL FOR EXISTING ALREADY DOWNLOADE FILES
+# 3. CONTROL FOR EXISTING ALREADY DOWNLOADED FILES
 # 4. LOG FILE
 # 5. EXTERNAL SETTING FILE
 # 6. ROBUST ERRORS CHECK
@@ -26,10 +26,10 @@ UrlToOpen = "http://oishare/DCIM/100OLYMP"
 
 try:
     OlympusHost = urllib2.urlopen(UrlToOpen)
-    print ">>	" +UrlToOpen + " open"
+    print (">>	" +UrlToOpen + " open")
 
 except:
-    print ">>	An error occured"
+    print (">>	An error occured")
 
 #except URLError, e:
 #    print "An error occured"
@@ -52,7 +52,7 @@ while row:
 
 #print imagesName # DEBUG
 
-print ">>	Found " + str(numberOfImages) + " images on the device"
+print (">>	Found " + str(numberOfImages) + " images on the device")
 
 page = urllib2.urlopen('http://192.168.0.10/DCIM').read()
 for i in range(numberOfImages):
@@ -63,10 +63,10 @@ for i in range(numberOfImages):
 
 	source = "http://oishare/DCIM/100OLYMP/" + imagesName[i]
 	destination = "/tmp/" + imagesName[i]
-	print ">>	" + source + " ---> " + destination
+	print (">>	" + source + " ---> " + destination)
 	urllib.urlretrieve(source ,destination)
-	print ">> Image " + imagesName[i] + " downloaded"
+	print (">> Image " + imagesName[i] + " downloaded")
 
-print ">>	All files downloades"
+print (">>	All files downloades")
 
 OlympusHost.close()
